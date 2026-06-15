@@ -76,17 +76,26 @@ to spotlight:
 
 ## 4. Wrap your app in the provider
 
-The provider is **router-agnostic** — you wire in your router's current path and
-navigate function.
+**Where does it go?** One provider, near the **root of your app**, rendered
+**inside your router** (it reads the router's hooks). Everything that should
+show tours/checklist/help goes inside it — i.e. your whole app. The nesting is
+always: **Router → OnboardingProvider → App**.
 
-### react-router
+### react-router — complete `main.tsx`
+
+This is the entire wiring — copy it and adjust the imports:
 
 ```tsx
+// src/main.tsx
+import { createRoot } from "react-dom/client";
+import { BrowserRouter, useLocation, useNavigate } from "react-router-dom";
 import { OnboardingProvider } from "react-guided-journey";
-import { useLocation, useNavigate } from "react-router-dom";
 import "react-guided-journey/styles.css";
+import App from "./App";
+import { tours, journeys } from "./onboarding/config";
 
-function Providers({ children }) {
+// Wrapper so we can read router hooks (it must be inside the router).
+function AppProviders({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   return (
@@ -94,20 +103,29 @@ function Providers({ children }) {
       config={{
         tours,
         journeys,
-        role: currentUser.role,   // any string, optional
-        userId: currentUser.id,   // namespaces persistence
-        currentPath: pathname,
-        onNavigate: navigate,
+        currentPath: pathname, // from the router
+        onNavigate: navigate,  // from the router
+        // role:   user?.role, // optional — filters by role
+        // userId: user?.id,   // optional — keeps each user's progress
       }}
     >
       {children}
     </OnboardingProvider>
   );
 }
+
+createRoot(document.getElementById("root")!).render(
+  <BrowserRouter>
+    <AppProviders>
+      <App />
+    </AppProviders>
+  </BrowserRouter>,
+);
 ```
 
-> `<OnboardingProvider>` must be rendered **inside** your `<Router>` so that
-> `useLocation`/`useNavigate` are available.
+> Order matters: `<BrowserRouter>` → `<AppProviders>` (the provider) →
+> `<App />`. The provider must be **inside** the router, and your app **inside**
+> the provider.
 
 ### Next.js (app router)
 

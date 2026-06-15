@@ -81,23 +81,42 @@ import "react-guided-journey/styles.css";
 
 ## Quick start
 
+One provider, near the root, **inside your router**. The nesting is always
+**Router → OnboardingProvider → App**. Here's a complete `main.tsx`:
+
 ```tsx
-<OnboardingProvider
-  config={{
-    tours,
-    journeys,
-    role: currentUser.role,
-    userId: currentUser.id,
-    currentPath: location.pathname, // from your router
-    onNavigate: navigate,           // from your router
-  }}
->
-  <App />
-</OnboardingProvider>
+// src/main.tsx
+import { createRoot } from "react-dom/client";
+import { BrowserRouter, useLocation, useNavigate } from "react-router-dom";
+import { OnboardingProvider } from "react-guided-journey";
+import "react-guided-journey/styles.css";
+import App from "./App";
+import { tours, journeys } from "./onboarding/config";
+
+function AppProviders({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();   // must be inside the router
+  const navigate = useNavigate();
+  return (
+    <OnboardingProvider
+      config={{ tours, journeys, currentPath: pathname, onNavigate: navigate }}
+    >
+      {children}
+    </OnboardingProvider>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(
+  <BrowserRouter>
+    <AppProviders>
+      <App />
+    </AppProviders>
+  </BrowserRouter>,
+);
 ```
 
-See [`example/App.tsx`](./example/App.tsx) for a full react-router example, or
-run the interactive demo locally:
+That's the whole setup — the welcome modal, checklist, help center and tours
+now render automatically. See the [Getting started guide](./docs/getting-started.md)
+for roles, persistence, theming and more, or run the interactive demo locally:
 
 ```bash
 cd demo

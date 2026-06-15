@@ -177,33 +177,62 @@ import "react-guided-journey/styles.css";`}
 
         <Doc id="quickstart" title="Provider & config">
           <p>
-            Mount the provider inside your router and wire its path + navigate.
-            It's router- and role-agnostic — you pass those in.
+            Mount <b>one</b> provider near the root of your app,{" "}
+            <b>inside your router</b> (it reads the router's hooks). Everything
+            that should show tours/checklist/help goes inside it — i.e. your
+            whole app. The nesting is always{" "}
+            <b>Router → OnboardingProvider → App</b>. Here's the complete{" "}
+            <Code>main.tsx</Code>:
           </p>
           <CodeBlock
-            code={`// providers/AppProviders.tsx
+            code={`// src/main.tsx
+import { createRoot } from "react-dom/client";
+import { BrowserRouter, useLocation, useNavigate } from "react-router-dom";
 import { OnboardingProvider } from "react-guided-journey";
-import { useLocation, useNavigate } from "react-router-dom";
-import { tours, journeys, discoveries } from "../onboarding";
+import "react-guided-journey/styles.css";
+import App from "./App";
+import { tours, journeys } from "./onboarding/config";
 
-export function AppProviders({ children, user }) {
-  const { pathname } = useLocation();   // your router's current path
-  const navigate = useNavigate();       // your router's navigate fn
-
+// Wrapper so we can read the router hooks (it must be inside the router).
+function AppProviders({ children }) {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   return (
     <OnboardingProvider
-      config={{ tours, journeys, discoveries,
-        role: user.role,
-        userId: user.id,
-        currentPath: pathname,
-        onNavigate: navigate,
+      config={{
+        tours,
+        journeys,
+        currentPath: pathname,   // from the router
+        onNavigate: navigate,    // from the router
+        // role:   user?.role,   // optional
+        // userId: user?.id,     // optional (keeps each user's progress)
       }}
     >
       {children}
     </OnboardingProvider>
   );
-}`}
+}
+
+createRoot(document.getElementById("root")!).render(
+  <BrowserRouter>
+    <AppProviders>
+      <App />
+    </AppProviders>
+  </BrowserRouter>,
+);`}
           />
+          <Callout>
+            Order matters: <Code>&lt;BrowserRouter&gt;</Code> →{" "}
+            <Code>&lt;AppProviders&gt;</Code> (the provider) →{" "}
+            <Code>&lt;App /&gt;</Code>. The provider must be inside the router,
+            and your app inside the provider.
+          </Callout>
+          <p>
+            That's the whole wiring — the welcome modal, checklist pill, help
+            center and tours now render automatically. Add a{" "}
+            <Code>data-tour</Code> attribute to anything you want a tour to point
+            at (see <a href="#tours">Tours</a>).
+          </p>
           <p>
             <b>What every config prop does:</b>
           </p>
@@ -589,8 +618,14 @@ function Code({ children }: { children: ReactNode }) {
   return <code className="inline-code">{children}</code>;
 }
 
-function Callout({ children }: { children: ReactNode }) {
-  return <div className="callout">💡 {children}</div>;
+function Callout({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={`callout ${className}`}>💡 {children}</div>;
 }
 
 function FileTree({ lines }: { lines: string[] }) {

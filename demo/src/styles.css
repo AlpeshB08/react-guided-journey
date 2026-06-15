@@ -623,6 +623,9 @@ body {
   font-size: 13.5px;
   color: #d2d9e8;
 }
+.callout-info {
+  margin-bottom: 14px;
+}
 .doc-list {
   margin: 0 0 16px;
   padding-left: 20px;
