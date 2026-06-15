@@ -1,29 +1,7 @@
 {
   "name": "react-guided-journey",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "Headless React onboarding system — guided tours with spotlight, a progress checklist, discovery banners and a help center. Zero runtime dependencies, router-agnostic, DB-ready persistence.",
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./styles.css": "./dist/styles.css"
-  },
-  "files": ["dist", "README.md", "LICENSE"],
-  "sideEffects": ["**/*.css"],
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
-    "lint": "biome check src",
-    "format": "biome check --write src",
-    "prepublishOnly": "npm run build"
-  },
   "keywords": [
     "react",
     "onboarding",
@@ -52,15 +30,50 @@
     "intro.js-alternative",
     "reactour-alternative"
   ],
-  "author": "Alpesh Baraiya",
-  "license": "MIT",
+  "homepage": "https://github.com/AlpeshB08/react-guided-journey#readme",
+  "bugs": {
+    "url": "https://github.com/AlpeshB08/react-guided-journey/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlpeshB08/react-guided-journey.git"
+  },
   "funding": {
     "type": "github",
     "url": "https://github.com/sponsors/AlpeshB08"
   },
-  "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+  "license": "MIT",
+  "author": "Alpesh Baraiya",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "directories": {
+    "doc": "docs",
+    "example": "example"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src",
+    "format": "biome check --write src",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0",
@@ -70,5 +83,13 @@
     "react-dom": "^19.1.0",
     "tsup": "^8.3.0",
     "typescript": "^5.6.0"
-  }
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "module": "./dist/index.js",
+  "sideEffects": [
+    "**/*.css"
+  ]
 }
