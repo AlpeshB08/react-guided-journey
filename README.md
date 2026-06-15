@@ -2,10 +2,15 @@
 
 A complete, headless React onboarding system — not just a tooltip library.
 
+[![npm](https://img.shields.io/npm/v/react-guided-journey.svg)](https://www.npmjs.com/package/react-guided-journey)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![Sponsor](https://img.shields.io/badge/Sponsor-♥-ec4899.svg)](https://github.com/sponsors/AlpeshB08)
+
 **[▶ Live interactive demo](https://AlpeshB08.github.io/react-guided-journey/)** ·
 [Getting started](./docs/getting-started.md) ·
 [Hosting](./docs/hosting.md) ·
-[Publishing](./docs/publishing.md)
+[Publishing](./docs/publishing.md) ·
+[Sponsor](https://github.com/sponsors/AlpeshB08)
 
 > Try every feature live before you install — tours, checklist, help center,
 > discovery tips, theming, and the persisted state (refresh to see it resume).
@@ -155,6 +160,12 @@ Override any CSS variable (`--rgj-primary`, `--rgj-surface`, `--rgj-radius`, …
 in your own stylesheet. Or set `renderDefaultUI={false}` on the provider and
 build your own UI with the exported `useOnboarding()` hook + `<TourRenderer />`.
 
+## Sponsor
+
+react-guided-journey is free and MIT-licensed. If it saves you time, you can
+support its development via **[GitHub Sponsors](https://github.com/sponsors/AlpeshB08)**
+— one-time or monthly. Thank you 🙏
+
 ## License
 
-MIT
+MIT © [Alpesh Baraiya](https://github.com/AlpeshB08)

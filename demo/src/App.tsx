@@ -208,11 +208,11 @@ export function App() {
           </a>
           <a
             className="coffee"
-            href="https://www.buymeacoffee.com/"
+            href="https://github.com/sponsors/AlpeshB08"
             target="_blank"
             rel="noreferrer"
           >
-            ☕ Buy me a coffee
+            ♥ Sponsor
           </a>
         </div>
         <div className="footer-copy">

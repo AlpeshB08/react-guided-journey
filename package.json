@@ -55,8 +55,8 @@
   "author": "Alpesh Baraiya",
   "license": "MIT",
   "funding": {
-    "type": "buymeacoffee",
-    "url": "https://www.buymeacoffee.com/"
+    "type": "github",
+    "url": "https://github.com/sponsors/AlpeshB08"
   },
   "peerDependencies": {
     "react": ">=18",
