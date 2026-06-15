@@ -1,0 +1,74 @@
+{
+  "name": "react-guided-journey",
+  "version": "0.1.0",
+  "description": "Headless React onboarding system — guided tours with spotlight, a progress checklist, discovery banners and a help center. Zero runtime dependencies, router-agnostic, DB-ready persistence.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "sideEffects": ["**/*.css"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src",
+    "format": "biome check --write src",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react",
+    "onboarding",
+    "product-tour",
+    "guided-tour",
+    "walkthrough",
+    "spotlight",
+    "checklist",
+    "user-onboarding",
+    "tooltip",
+    "coachmark",
+    "headless",
+    "tour",
+    "feature-tour",
+    "product-adoption",
+    "user-guide",
+    "tour-guide",
+    "intro",
+    "hint",
+    "popover",
+    "react-tour",
+    "nextjs-onboarding",
+    "react-joyride-alternative",
+    "driver.js-alternative",
+    "shepherd-alternative",
+    "intro.js-alternative",
+    "reactour-alternative"
+  ],
+  "author": "Alpesh Baraiya",
+  "license": "MIT",
+  "funding": {
+    "type": "buymeacoffee",
+    "url": "https://www.buymeacoffee.com/"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0"
+  }
+}
