@@ -3,6 +3,8 @@
 A complete, headless React onboarding system — not just a tooltip library.
 
 [![npm](https://img.shields.io/npm/v/react-guided-journey.svg)](https://www.npmjs.com/package/react-guided-journey)
+[![CI](https://github.com/AlpeshB08/react-guided-journey/actions/workflows/ci.yml/badge.svg)](https://github.com/AlpeshB08/react-guided-journey/actions/workflows/ci.yml)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/react-guided-journey)](https://bundlephobia.com/package/react-guided-journey)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Sponsor](https://img.shields.io/badge/Sponsor-♥-ec4899.svg)](https://github.com/sponsors/AlpeshB08)
 

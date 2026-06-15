@@ -100,6 +100,9 @@ function TourLayer({
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(FALLBACK_HEIGHT);
   const [measured, setMeasured] = useState(false);
+  // Re-hide and re-measure whenever the step changes (the value of stepIndex
+  // isn't read in the body, but it IS the intended trigger).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on step change
   useEffect(() => {
     setMeasured(false);
   }, [stepIndex]);
