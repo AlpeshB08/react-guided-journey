@@ -7,6 +7,15 @@ import { Docs } from "./Docs";
 
 type View = "demo" | "docs";
 
+// The Docs sub-nav uses in-page anchors (#install, #tours, …), so while you're
+// reading the docs the hash is usually a section id, not "#docs". Treat any
+// non-empty hash other than the demo's "#" as the docs view — that's what makes
+// a refresh keep you on Docs instead of bouncing back to the demo.
+function viewFromHash(): View {
+  const h = window.location.hash.replace(/^#/, "");
+  return h !== "" && h !== "demo" ? "docs" : "demo";
+}
+
 /**
  * Animated brand mark: a "guided journey" — a marker travels a dashed route
  * toward a pulsing destination node. Stroke uses the live accent color.
@@ -137,23 +146,31 @@ function Topbar({ view, setView }: { view: View; setView: (v: View) => void }) {
 export function App() {
   const [accent, setAccent] = useState(THEMES[0].color);
   const [speed, setSpeed] = useState(220); // tour step transition (ms)
-  const [view, setView] = useState<View>(
-    window.location.hash.includes("docs") ? "docs" : "demo",
-  );
+  const [view, setView] = useState<View>(viewFromHash);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--rgj-primary", accent);
     document.documentElement.style.setProperty("--accent", accent);
   }, [accent]);
 
-  // Reflect the view in the URL hash without adding history entries or jumping
-  // the scroll position (which was causing a visible flash).
+  // Keep the view in sync if the hash changes by other means (back/forward,
+  // a manually edited URL). In-page doc anchors keep us on "docs", which is
+  // correct. replaceState (used by tab clicks below) doesn't fire this.
   useEffect(() => {
-    const next = view === "docs" ? "#docs" : "#";
-    if (window.location.hash !== next) {
-      window.history.replaceState(null, "", next);
-    }
-  }, [view]);
+    const onHashChange = () => setView(viewFromHash());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  // Switch tabs: reflect the view in the URL hash (so a refresh restores the
+  // same view) and reset the shared window scroll. Both views scroll the same
+  // document, so without this the second view inherits the first's scroll
+  // position (e.g. scroll the demo to the bottom, open Docs, land at the bottom).
+  const selectView = (next: View) => {
+    setView(next);
+    window.history.replaceState(null, "", next === "docs" ? "#docs" : "#");
+    window.scrollTo(0, 0);
+  };
 
   return (
     <OnboardingProvider
@@ -175,7 +192,7 @@ export function App() {
       }}
     >
       <ScrollProgress />
-      <Topbar view={view} setView={setView} />
+      <Topbar view={view} setView={selectView} />
 
       <main className={`view ${view === "docs" ? "view-docs" : ""}`} key={view}>
         {view === "demo" ? (

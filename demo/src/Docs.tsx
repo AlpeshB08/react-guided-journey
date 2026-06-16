@@ -8,11 +8,13 @@ const SECTIONS = [
   { id: "quickstart", label: "Provider & config" },
   { id: "tours", label: "Tours" },
   { id: "checklist", label: "Checklist (journeys)" },
+  { id: "autolaunch", label: "Welcome & auto-launch" },
   { id: "roles", label: "Roles & access" },
   { id: "tips", label: "Discovery tips" },
   { id: "theming", label: "Theming" },
   { id: "persistence", label: "Persistence" },
   { id: "api", label: "API & hooks" },
+  { id: "custom-ui", label: "Custom UI" },
 ];
 
 export function Docs() {
@@ -227,11 +229,15 @@ createRoot(document.getElementById("root")!).render(
             <Code>&lt;App /&gt;</Code>. The provider must be inside the router,
             and your app inside the provider.
           </Callout>
-          <p>
+          <p className="mt-4">
             That's the whole wiring — the welcome modal, checklist pill, help
             center and tours now render automatically. Add a{" "}
-            <Code>data-tour</Code> attribute to anything you want a tour to point
-            at (see <a href="#tours">Tours</a>).
+            <Code>data-tour</Code> attribute to anything you want a tour to
+            point at (see{" "}
+            <a className="docs-link" href="#tours">
+              Tours
+            </a>
+            ).
           </p>
           <p>
             <b>What every config prop does:</b>
@@ -350,6 +356,31 @@ export const tours: TourConfig[] = [{
             code={`// components/StatsCard.tsx
 <section data-tour="stats">…</section>`}
           />
+          <p>
+            <b>
+              Where the <Code>data-tour</Code> attribute goes:
+            </b>{" "}
+            on the JSX of the component you want to spotlight — <i>not</i> in
+            the tour config. The config only holds the matching selector (
+            <Code>target: "[data-tour='stats']"</Code>); the attribute itself
+            lives on the real element, wherever that component renders.
+          </p>
+          <ul className="doc-list">
+            <li>
+              <b>Async / lazily-rendered targets</b> — elements that only appear
+              after a data fetch are handled automatically. A{" "}
+              <Code>MutationObserver</Code> waits for the element to mount, so
+              you don't need timeouts or any extra config.
+            </li>
+            <li>
+              <b>Step not showing? Turn on debug.</b> Set{" "}
+              <Code>debug: true</Code> in the provider config while developing.
+              When a step's <Code>target</Code> selector can't be found in the
+              DOM, the tooltip shows a visible warning (and it always logs to
+              the console) — so a typo'd selector or a missing{" "}
+              <Code>data-tour</Code> attribute is obvious instead of silent.
+            </li>
+          </ul>
         </Doc>
 
         <Doc id="checklist" title="Checklist (journeys)">
@@ -377,6 +408,76 @@ export const journeys: JourneyConfig[] = [{
             The checklist pill, progress bar and welcome modal render
             automatically — you don't place them anywhere.
           </p>
+        </Doc>
+
+        <Doc id="autolaunch" title="Welcome & auto-launch">
+          <p>
+            A journey's <Code>welcome</Code> modal and a tour's{" "}
+            <Code>autoLaunch</Code> are <b>independent</b> — they're configured
+            in different places and don't wait on each other. Knowing exactly
+            how they interact saves a lot of "why did the tour fire over the
+            welcome popup?" confusion.
+          </p>
+          <ul className="doc-list">
+            <li>
+              If a journey defines <Code>welcome</Code> <i>and</i> a tour on the
+              same route has <Code>autoLaunch: true</Code>, <b>both trigger</b>.
+              Auto-launch does <b>not</b> wait for the welcome modal to be
+              closed first.
+            </li>
+            <li>
+              Auto-launch is <b>not</b> gated behind <Code>welcomeSeen</Code> —
+              it fires as soon as the route is matched (after{" "}
+              <Code>autoLaunchDelay</Code>, default 600&nbsp;ms), regardless of
+              whether the welcome has been seen.
+            </li>
+            <li>
+              The only gate is <Code>seenTours</Code>: a tour lands there once
+              it's <b>completed or dismissed</b>, and won't auto-launch again.
+              The welcome modal has no effect on that gate.
+            </li>
+          </ul>
+          <Callout>
+            Want "Welcome → checklist → Show me how → tour" rather than a tour
+            firing on top of the welcome? Keep <Code>autoLaunch: false</Code>{" "}
+            and let the checklist's "Show me how" button start the tour.
+          </Callout>
+          <p className="mt-4">
+            <b>Pick the flow you want:</b>
+          </p>
+          <div className="ptable-wrap">
+            <table className="ptable">
+              <thead>
+                <tr>
+                  <th>Goal</th>
+                  <th>Config</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Welcome → checklist → "Show me how" → tour</td>
+                  <td>
+                    Define <Code>welcome</Code>, set{" "}
+                    <Code>autoLaunch: false</Code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Tour auto-starts, no welcome</td>
+                  <td>
+                    <Code>autoLaunch: true</Code>, don't define{" "}
+                    <Code>welcome</Code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Welcome → "Start" click → tour immediately</td>
+                  <td>
+                    <Code>renderDefaultUI={"{false}"}</Code> + custom modal
+                    calling <Code>startTour()</Code>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </Doc>
 
         <Doc id="roles" title="Roles & access">
@@ -411,6 +512,19 @@ export const journeys: JourneyConfig[] = [{
             the <Code>roles</Code> field everywhere — everything shows to
             everyone.
           </p>
+          <Callout className="mb-4">
+            <b>Gotcha — undefined role vs. empty roles.</b> If a tour/journey
+            declares <Code>roles</Code> but <Code>config.role</Code> is{" "}
+            <Code>undefined</Code> (e.g. your auth's <Code>user?.role</Code>{" "}
+            hasn't loaded yet), <b>nothing matches and no content shows</b> —
+            silently. Omitting <Code>roles</Code> (or <Code>roles: []</Code>)
+            means <i>everyone</i>; an <i>undefined</i> role checked against a{" "}
+            <i>defined</i> <Code>roles</Code> list means <i>no-one</i>. If a
+            journey "won't appear", log <Code>config.role</Code> and confirm
+            it's one of the journey's <Code>roles</Code>. In a single-role app,
+            drop the <Code>roles</Code> field from your tours/journeys entirely
+            so a missing role can never gate them out.
+          </Callout>
           <CodeBlock
             code={`// Multi-role: pick the journey + tours for this user
 <OnboardingProvider config={{ ...config, role: user.role }}>
@@ -517,7 +631,18 @@ import { DiscoveryBanner } from "react-guided-journey";
             <Code>userId</Code> (so each user has their own progress, and signed
             -out users don't collide). No setup required.
           </p>
-          <p>
+          <Callout>
+            <b>
+              <Code>userId</Code> matters in multi-user apps.
+            </b>{" "}
+            Omit it and every user on that device shares the <i>same</i>{" "}
+            localStorage key — if user A finishes a tour, user B sees it as
+            already seen. Pass <Code>userId: user.id</Code> so each person gets
+            their own namespace. When <Code>userId</Code> changes (a different
+            user logs in), state automatically switches to that user's namespace
+            — the previous user's progress doesn't linger or carry over.
+          </Callout>
+          <p className="mt-4">
             <b>Persist to your backend</b> by implementing a{" "}
             <Code>PersistenceAdapter</Code>. Both <Code>load</Code> and{" "}
             <Code>save</Code> may be synchronous or return a Promise — the
@@ -580,9 +705,122 @@ function HelpButton() {
           />
           <p>
             Want a fully custom look? Set{" "}
-            <Code>renderDefaultUI={"{false}"}</Code> and compose your own
-            components with the hook plus <Code>&lt;TourRenderer /&gt;</Code>.
+            <Code>renderDefaultUI={"{false}"}</Code> and compose your own UI —
+            see{" "}
+            <a className="docs-link" href="#custom-ui">
+              Custom UI
+            </a>{" "}
+            below.
           </p>
+        </Doc>
+
+        <Doc id="custom-ui" title="Custom UI & programmatic control">
+          <p>
+            Set <Code>renderDefaultUI={"{false}"}</Code> on the provider to drop
+            the built-in surfaces and build your own. Exactly three components
+            stop rendering — <Code>&lt;WelcomeModal /&gt;</Code>,{" "}
+            <Code>&lt;Checklist /&gt;</Code> and{" "}
+            <Code>&lt;HelpCenter /&gt;</Code>.{" "}
+            <Code>&lt;TourRenderer /&gt;</Code> <b>always</b> renders — the
+            provider mounts it for you regardless, so tours keep working even
+            with your own UI.
+          </p>
+          <PropsTable
+            head={["Component", "Renders when", "What it is"]}
+            rows={[
+              [
+                "<WelcomeModal/>",
+                "renderDefaultUI",
+                "First-run welcome popup.",
+              ],
+              [
+                "<Checklist />",
+                "renderDefaultUI",
+                "Getting-started checklist pill + panel.",
+              ],
+              [
+                "<HelpCenter />",
+                "renderDefaultUI",
+                "Help center panel (replay any tour).",
+              ],
+              [
+                "<TourRenderer/>",
+                "always",
+                "Tour spotlight + tooltip. Mounted by the provider — you don't add it.",
+              ],
+            ]}
+          />
+          <p>
+            All four are exported, so you can also mount them individually if
+            you want some defaults but not others. Drive everything from{" "}
+            <Code>useOnboarding()</Code>:
+          </p>
+          <CodeBlock
+            lang="tsx"
+            code={`import { OnboardingProvider, useOnboarding } from "react-guided-journey";
+
+function CustomWelcome() {
+  const { welcomeSeen, markWelcomeSeen, startTour, setChecklistOpen } =
+    useOnboarding();
+  if (welcomeSeen) return null;
+
+  return (
+    <div className="my-modal">
+      <h2>Welcome 👋</h2>
+      <button onClick={() => { markWelcomeSeen(); startTour("dashboard"); }}>
+        Start the tour
+      </button>
+      <button onClick={() => { markWelcomeSeen(); setChecklistOpen(true); }}>
+        Later — show me the checklist
+      </button>
+    </div>
+  );
+}
+
+<OnboardingProvider renderDefaultUI={false} config={config}>
+  <App />
+  <CustomWelcome />
+  {/* No <TourRenderer /> needed — the provider renders it for you. */}
+</OnboardingProvider>`}
+          />
+          <Callout>
+            Handy actions on <Code>useOnboarding()</Code>:{" "}
+            <Code>startTour(id)</Code>, <Code>markWelcomeSeen()</Code>,{" "}
+            <Code>setChecklistOpen(open)</Code>, <Code>toggleChecklist()</Code>,{" "}
+            <Code>setHelpCenterOpen(open)</Code>, <Code>completeStep(id)</Code>{" "}
+            and <Code>reset()</Code>.
+          </Callout>
+
+          <h3 className="doc-subhead">
+            Starting a tour on another route (navigate-then-tour)
+          </h3>
+          <p>
+            Calling <Code>startTour(id)</Code> directly only works when you're
+            already on the tour's <Code>route</Code> — its target elements have
+            to be in the DOM. To kick off a tour that lives on a{" "}
+            <i>different</i> route, use <Code>setPendingTour(id)</Code> instead:
+            the library navigates there (via your <Code>onNavigate</Code>) and
+            auto-starts the tour the moment the route matches.
+          </p>
+          <CodeBlock
+            lang="tsx"
+            code={`const { setPendingTour, navigate } = useOnboarding();
+
+// From anywhere — even a different page. Navigates, then starts the tour
+// once its route is matched:
+setPendingTour("billing-tour");
+
+// navigate is just your router's navigate (config.onNavigate), re-exposed
+// so you don't reach for window.history directly:
+navigate("/settings/billing");`}
+          />
+          <Callout>
+            The built-in checklist's "Show me how" button already uses this
+            exact flow (<Code>startTour</Code> when on-route, otherwise{" "}
+            <Code>setPendingTour</Code> + navigate). Reach for{" "}
+            <Code>setPendingTour</Code> only when wiring a tour into your own
+            UI.
+          </Callout>
         </Doc>
 
         <div className="docs-foot">
@@ -637,14 +875,16 @@ function FileTree({ lines }: { lines: string[] }) {
 }
 
 function PropsTable({
+  className,
   rows,
   head = ["Prop", "Type", "What it does"],
 }: {
+  className?: string;
   rows: string[][];
   head?: string[];
 }) {
   return (
-    <div className="ptable-wrap">
+    <div className={`ptable-wrap ${className}`}>
       <table className="ptable">
         <thead>
           <tr>

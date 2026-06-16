@@ -19,7 +19,6 @@
   box-sizing: border-box;
 }
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: 80px;
 }
 body {
@@ -598,10 +597,26 @@ body {
   margin: 0 0 14px;
   letter-spacing: -0.01em;
 }
+.doc-section .docs-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+.mt-4 {
+  margin-top: 1rem !important;
+}
+.mb-4 {
+  margin-bottom: 1rem !important;
+}
 .doc-section p {
   color: #c2cadb;
   font-size: 14.5px;
   margin: 0 0 14px;
+}
+.doc-subhead {
+  font-size: 17px;
+  margin: 26px 0 12px;
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
 .doc-section strong {
   color: var(--text);
