@@ -167,8 +167,9 @@ import "react-guided-journey/styles.css";`}
               to the component you want to spotlight, wherever it lives.
             </li>
             <li>
-              <b>&lt;DiscoveryBanner /&gt;</b> — drop it on the page where that
-              tip belongs (it self-hides once dismissed).
+              <b>&lt;DiscoveryBanner /&gt;</b> — only for <i>inline</i> tips,
+              dropped where they belong. Floating (corner) tips render
+              automatically from config.
             </li>
             <li>
               <b>Default UI</b> (checklist pill, help center, welcome modal) —
@@ -257,7 +258,7 @@ createRoot(document.getElementById("root")!).render(
               [
                 "discoveries",
                 "DiscoveryConfig[]",
-                "Tip definitions rendered by <DiscoveryBanner>.",
+                "Tip definitions. Floating tips auto-render; inline tips use <DiscoveryBanner>.",
               ],
               [
                 "role",
@@ -334,7 +335,8 @@ export const tours: TourConfig[] = [{
   route: "/",                     // where this tour runs
   autoLaunch: true,               // start on first visit to the route
   roles: ["admin"],               // optional — who sees it
-  checklistStepId: "see-dashboard", // mark this task done when finished
+  // No checklistStepId needed: the journey task that points here via
+  // tourId is completed automatically when this tour finishes.
   steps: [{
     id: "stats",
     target: "[data-tour='stats']", // any CSS selector
@@ -387,8 +389,9 @@ export const tours: TourConfig[] = [{
           <p>
             A journey is a getting-started checklist plus an optional welcome
             modal. Keep it in <Code>onboarding/journeys.ts</Code>. A task with a{" "}
-            <Code>tourId</Code> shows a "Show me how" button; finishing that
-            tour ticks the task off.
+            <Code>tourId</Code> shows a "Show me how" button; finishing that tour
+            ticks the task off automatically (matched by the task's{" "}
+            <Code>id</Code>).
           </p>
           <CodeBlock
             code={`// onboarding/journeys.ts
@@ -399,15 +402,27 @@ export const journeys: JourneyConfig[] = [{
   checklistTitle: "Getting started",
   welcome: { title: "Welcome 👋", body: "Let's set up.", primaryLabel: "Start" },
   steps: [
-    { id: "see-dashboard", title: "Take the tour", tourId: "dashboard", order: 1 },
-    { id: "invite-team",   title: "Invite your team", route: "/team", order: 2 },
+    // Tasks render in array order. icon is any React node (component or emoji).
+    { id: "see-dashboard", title: "Take the tour", icon: "📊", tourId: "dashboard" },
+    { id: "invite-team",   title: "Invite your team", icon: "👥", route: "/team" },
   ],
 }];`}
           />
-          <p>
-            The checklist pill, progress bar and welcome modal render
-            automatically — you don't place them anywhere.
-          </p>
+          <ul className="doc-list">
+            <li>
+              <b>No numbering to maintain</b> — tasks render in array order.{" "}
+              <Code>order</Code> exists only as an optional override.
+            </li>
+            <li>
+              <b>Link a task to a tour with just <Code>tourId</Code></b> —
+              finishing the tour completes the task, and the "Go" button
+              defaults to that tour's <Code>route</Code>, so you don't repeat it.
+            </li>
+            <li>
+              The checklist pill, progress bar and welcome modal render
+              automatically — you don't place them anywhere.
+            </li>
+          </ul>
         </Doc>
 
         <Doc id="autolaunch" title="Welcome & auto-launch">
@@ -541,9 +556,7 @@ export const journeys: JourneyConfig[] = [{
         <Doc id="tips" title="Discovery tips">
           <p>
             Small dismissible highlights for a feature or page. Define them in{" "}
-            <Code>onboarding/discoveries.ts</Code>, then drop a{" "}
-            <Code>&lt;DiscoveryBanner /&gt;</Code> on the page where the tip
-            belongs. Inline or pinned to a corner; each has its own icon, accent
+            <Code>onboarding/discoveries.ts</Code>. Each has its own icon, accent
             and optional CTA. Dismissals persist.
           </p>
           <CodeBlock
@@ -559,12 +572,29 @@ export const discoveries = [{
   action: { label: "Show me", onClick: () => navigate("/reports") },
 }];`}
           />
+          <PropsTable
+            head={["Placement", "How it renders", "What you do"]}
+            rows={[
+              [
+                "bottom-right / *-left / top-*",
+                "Floating, pinned to a corner",
+                "Nothing — the provider renders it automatically from config.",
+              ],
+              [
+                "inline (default)",
+                "In your page's document flow",
+                "Place <DiscoveryBanner id> where you want it (below).",
+              ],
+            ]}
+          />
           <CodeBlock
             lang="tsx"
-            code={`// ReportsPage.tsx — place where the tip should appear
+            code={`// Only inline tips need this — drop it where the tip should sit.
+// (Floating tips already render from config; mounting one here is a
+//  harmless no-op, so you never get a duplicate.)
 import { DiscoveryBanner } from "react-guided-journey";
 
-<DiscoveryBanner id="new-reports" />`}
+<DiscoveryBanner id="filter-hint" />`}
           />
           <p>
             Inline tips sit in the document flow; floating ones are portaled to{" "}

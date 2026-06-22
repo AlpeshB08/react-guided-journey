@@ -283,6 +283,7 @@ export function TourRenderer() {
     activeTourId,
     activeStepIndex,
     getTourById,
+    journey,
     nextStep,
     prevStep,
     endTour,
@@ -298,9 +299,15 @@ export function TourRenderer() {
 
   const isLast = activeStepIndex >= tour.steps.length - 1;
 
+  // Which checklist step to complete: the tour's explicit override, or — by
+  // default — the journey step that points at this tour via `tourId`.
+  const checklistStepId =
+    tour.checklistStepId ??
+    journey?.steps.find((s) => s.tourId === tour.id)?.id;
+
   const handleNext = () => {
     step.onAfterStep?.();
-    if (isLast) endTour(tour.checklistStepId);
+    if (isLast) endTour(checklistStepId);
     else nextStep();
   };
   const handlePrev = () => {

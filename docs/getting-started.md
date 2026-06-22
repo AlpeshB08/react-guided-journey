@@ -33,7 +33,6 @@ export const tours: TourConfig[] = [
     title: "Dashboard tour",
     route: "/",
     autoLaunch: true,            // start on first visit to "/"
-    checklistStepId: "see-dashboard", // mark this checklist task done when finished
     steps: [
       {
         id: "stats",
@@ -59,8 +58,10 @@ export const journeys: JourneyConfig[] = [
       {
         id: "see-dashboard",
         title: "Take the dashboard tour",
+        icon: "📊",              // optional — any React node (component or emoji)
         tourId: "dashboard",     // shows a "Show me how" button
-        order: 1,
+        // Finishing the "dashboard" tour completes this task automatically,
+        // and "Go" navigates to that tour's route — nothing else to wire up.
       },
     ],
   },
@@ -179,14 +180,32 @@ The state you store is just four arrays/booleans — see `PersistedState`.
 
 ## Discovery banners
 
-Place a dismissible tip anywhere:
+Add tips to `config.discoveries` — small dismissible highlights for a feature
+or page:
+
+```tsx
+discoveries: [
+  // Floating tip pinned to a corner — shows automatically, no extra wiring.
+  { id: "new-reports", title: "New!", body: "Reports just launched.",
+    placement: "bottom-right" },
+
+  // Inline tip — you choose where it sits in your layout.
+  { id: "filter-hint", title: "Tip", body: "Filter by date here." },
+]
+```
+
+- **Floating tips** (`placement: "bottom-right" | "bottom-left" | "top-right" |
+  "top-left"`) render **automatically** from config — nothing else to do.
+- **Inline tips** (the default) sit in your page flow, so you place them with the
+  component where you want them:
 
 ```tsx
 import { DiscoveryBanner } from "react-guided-journey";
 
-// config.discoveries = [{ id: "new-reports", title: "New!", body: "..." }]
-<DiscoveryBanner id="new-reports" />
+<DiscoveryBanner id="filter-hint" />
 ```
+
+Both stay dismissed once closed.
 
 ## Bring your own UI (headless mode)
 
@@ -232,5 +251,5 @@ Override any CSS variable in your own stylesheet (loaded after the library's):
 | Nothing appears | You forgot `import "react-guided-journey/styles.css"`. |
 | "Invalid hook call" | Duplicate React. Ensure the lib is a dep and React is deduped (single copy). |
 | Tour doesn't auto-launch | `autoLaunch` not set, route doesn't match, or it's already in `seenTours`. |
-| Tooltip points at nothing | The `target` selector doesn't match, or the element mounts late — it now waits via MutationObserver up to 8s, then centers. |
+| Tooltip points at nothing | The `target` selector doesn't match, or the element mounts late — it waits via MutationObserver up to 2.5s, then centers and logs a console warning. |
 | Provider error | A component using `useOnboarding` is outside `<OnboardingProvider>`. |

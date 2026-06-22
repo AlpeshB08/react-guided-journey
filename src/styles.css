@@ -362,6 +362,20 @@
   background: var(--rgj-primary);
   border-color: var(--rgj-primary);
 }
+.rgj-task-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--rgj-primary);
+}
+.rgj-task-icon svg {
+  width: 16px;
+  height: 16px;
+}
 .rgj-task-body {
   flex: 1;
   min-width: 0;

@@ -124,9 +124,6 @@ npm install
 npm run dev   # http://localhost:5173
 ```
 
-> The live-demo link above is a placeholder — update the username/org once you
-> push to GitHub and enable Pages (see [docs/hosting.md](./docs/hosting.md)).
-
 ## Concepts
 
 - **Tour** — an ordered list of spotlighted steps tied to a route. Set
@@ -135,10 +132,32 @@ npm run dev   # http://localhost:5173
   step can set its own `width`, `spotlightPadding`, async `onBeforeStep`
   (e.g. open a menu / await a fetch before highlighting) and `onAfterStep`.
 - **Journey** — a role-specific checklist of tasks + an optional welcome modal.
-  A task with a `tourId` shows a "Show me how" button; finishing that tour marks
-  the task complete (`checklistStepId`).
-- **Discovery** — a small inline "tip" banner you place anywhere; stays
-  dismissed once closed.
+  A task with a `tourId` shows a "Show me how" button; **finishing that tour
+  completes the task automatically** (matched by the task's `id`). Tasks render
+  in array order and can carry an `icon` (any React node — a component or emoji).
+- **Discovery** — a small dismissible "tip" banner. Floating (corner) tips
+  render automatically from config; inline tips are placed with
+  `<DiscoveryBanner id="…" />` where you want them. Stays dismissed once closed.
+
+### How a checklist task links to a tour
+
+You declare the link in **one** place — the task's `tourId`:
+
+```tsx
+// journey
+steps: [
+  { id: "take-tour", title: "Take the product tour", icon: "🗺️", tourId: "product-tour" },
+]
+
+// tour
+{ id: "product-tour", route: "/", title: "Product tour", steps: [/* … */] }
+```
+
+- Finishing `product-tour` completes the `take-tour` task — no `checklistStepId`
+  needed (it's auto-derived from `tourId`; set it only to override).
+- The task's **"Go"** button defaults to the tour's `route`, so you don't repeat
+  `route` on the task. Set the task's own `route` only for a task with no tour.
+- `order` is optional — tasks render in array order; set it only to override.
 
 ## Persisted state (DB-ready)
 

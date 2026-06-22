@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useRef } from "react";
-import { DiscoveryBanner, useOnboarding } from "react-guided-journey";
+import { useOnboarding } from "react-guided-journey";
 import { THEMES } from "./config";
 import { PlacementPlayground, TipsPlayground } from "./playgrounds";
 import { CodeBlock, CountUp, Reveal } from "./ui";
@@ -101,7 +101,8 @@ export function Demo({
 
   return (
     <div className="page">
-      <DiscoveryBanner id="tip-help" />
+      {/* The "tip-help" discovery is floating (bottom-left), so the provider
+          renders it automatically from config — no <DiscoveryBanner> needed. */}
 
       {/* Hero */}
       <header className="hero" data-tour="hero" ref={heroRef}>

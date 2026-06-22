@@ -46,6 +46,11 @@ export function Checklist() {
     }
   };
 
+  // Where the "Go" button sends the user: the step's own route, or — when the
+  // step is paired with a tour — that tour's route, so route isn't declared twice.
+  const goRoute = (s: (typeof journey.steps)[number]): string | undefined =>
+    s.route ?? (s.tourId ? getTourById(s.tourId)?.route : undefined);
+
   // Collapsed pill.
   if (!checklistOpen) {
     return (
@@ -62,7 +67,11 @@ export function Checklist() {
     );
   }
 
-  const steps = [...journey.steps].sort((a, b) => a.order - b.order);
+  // Render in array order by default; respect `order` only where it's set.
+  const steps = journey.steps
+    .map((s, index) => ({ s, index }))
+    .sort((a, b) => (a.s.order ?? a.index) - (b.s.order ?? b.index))
+    .map(({ s }) => s);
 
   return (
     <div
@@ -100,6 +109,11 @@ export function Checklist() {
           return (
             <li key={s.id} className={cn("rgj-task", done && "rgj-task-done")}>
               <span className="rgj-check">{done ? "✓" : ""}</span>
+              {s.icon != null && (
+                <span className="rgj-task-icon" aria-hidden="true">
+                  {s.icon}
+                </span>
+              )}
               <div className="rgj-task-body">
                 <p className="rgj-task-title">{s.title}</p>
                 {s.description && (
@@ -130,18 +144,23 @@ export function Checklist() {
                       </button>
                     )
                   )}
-                  {s.route && (
-                    <button
-                      type="button"
-                      className="rgj-btn rgj-btn-sm rgj-btn-ghost"
-                      onClick={() => {
-                        setChecklistOpen(false);
-                        navigate?.(s.route as string);
-                      }}
-                    >
-                      Go
-                    </button>
-                  )}
+                  {(() => {
+                    const route = goRoute(s);
+                    return (
+                      route && (
+                        <button
+                          type="button"
+                          className="rgj-btn rgj-btn-sm rgj-btn-ghost"
+                          onClick={() => {
+                            setChecklistOpen(false);
+                            navigate?.(route);
+                          }}
+                        >
+                          Go
+                        </button>
+                      )
+                    );
+                  })()}
                 </div>
               )}
             </li>

@@ -10,7 +10,8 @@ export const tours: TourConfig[] = [
     title: "Product tour",
     description: "A guided walkthrough of this page.",
     route: "/",
-    checklistStepId: "take-tour",
+    // No `checklistStepId` needed — the "take-tour" step below points here via
+    // `tourId`, so finishing this tour completes that step automatically.
     steps: [
       {
         id: "hero",
@@ -62,19 +63,20 @@ export const journeys: JourneyConfig[] = [
       body: "A complete onboarding system in one tiny package — tours, a checklist, a help center and discovery tips. Take the quick tour to see it all.",
       primaryLabel: "Show me around",
     },
+    // Steps render in array order — no `order` numbers to maintain.
     steps: [
       {
         id: "take-tour",
         title: "Take the product tour",
         description: "See the spotlight + tooltips in action.",
+        icon: "🗺️",
         tourId: "product-tour",
-        order: 1,
       },
       {
         id: "try-theme",
         title: "Try a different theme",
         description: "Pick an accent color.",
-        order: 2,
+        icon: "🎨",
         action: {
           label: "Take me there",
           onClick: () =>
@@ -87,7 +89,7 @@ export const journeys: JourneyConfig[] = [
         id: "open-help",
         title: "Open the help center",
         description: "Replay any tour anytime.",
-        order: 3,
+        icon: "💬",
         action: {
           label: "Open it",
           onClick: () =>

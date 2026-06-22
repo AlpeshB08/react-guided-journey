@@ -58,28 +58,56 @@ export interface TourConfig {
   roles?: string[];
   /** Auto-launch this tour the first time its route is visited. */
   autoLaunch?: boolean;
-  /** Checklist step id to mark complete when this tour finishes. */
+  /**
+   * Override which checklist step this tour completes when it finishes.
+   *
+   * You usually DON'T need this: if a journey step points at this tour with
+   * `tourId`, that step is completed automatically. Set this only for a tour
+   * that no journey step references, or to complete a different step than the
+   * one that launched it.
+   */
   checklistStepId?: string;
 }
 
 /** A task in the getting-started checklist. */
 export interface ChecklistStep {
+  /**
+   * Stable id. This is also what gets marked complete — when a paired tour
+   * (see `tourId`) finishes, the step with this id is completed automatically,
+   * so you don't repeat it as the tour's `checklistStepId`.
+   */
   id: string;
   title: string;
   description?: string;
-  /** Route the step lives on (renders a "Go" button). */
-  route?: string;
-  /** Tour to launch for this step (renders a "Show me how" button). */
+  /**
+   * Tour to launch for this step (renders a "Show me how" button). Finishing
+   * the tour completes this step. The "Go" button's destination defaults to
+   * this tour's `route`, so you normally don't also set `route` below.
+   */
   tourId?: string;
+  /**
+   * Where the "Go" button navigates. Optional — when `tourId` is set this
+   * defaults to that tour's `route`. Set it explicitly only for a step that has
+   * no tour, or to send "Go" somewhere other than the tour's route.
+   */
+  route?: string;
   /**
    * Custom action button — for tasks that aren't a tour or a route (e.g. open a
    * modal, scroll to a section, trigger the help center). Shown when there's no
    * tourId. The button label is yours.
    */
   action?: { label: string; onClick: () => void };
-  order: number;
-  /** Optional icon name/key resolved by the consumer's render function. */
-  icon?: string;
+  /**
+   * Display order. Optional — steps render in array order by default, so you
+   * rarely need this. Set it only to override the array order.
+   */
+  order?: number;
+  /**
+   * Leading icon for the step. Pass a React node directly (an icon component,
+   * an emoji string, etc.) — it's rendered as-is, no string→component mapping
+   * needed.
+   */
+  icon?: React.ReactNode;
 }
 
 /** A role-specific onboarding journey: a titled checklist of steps. */

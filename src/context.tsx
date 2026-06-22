@@ -19,6 +19,12 @@ interface ContextValue {
   adapter: PersistenceAdapter;
   config: Required<Pick<OnboardingConfig, "tooltipWidth" | "autoLaunchDelay">> &
     OnboardingConfig;
+  /**
+   * True when the provider auto-renders floating discoveries (default UI mode).
+   * `<DiscoveryBanner>` reads this to skip floating tips the provider already
+   * shows — so manually mounting one never produces a duplicate.
+   */
+  autoDiscoveries: boolean;
 }
 
 const OnboardingContext = createContext<ContextValue | null>(null);
@@ -56,7 +62,10 @@ export const OnboardingContextProvider = OnboardingContext.Provider;
  * Build the context value once per provider lifetime. Re-creating the store on
  * every render would drop state, so it lives in a ref keyed by user id.
  */
-export function useBuildContextValue(config: OnboardingConfig): ContextValue {
+export function useBuildContextValue(
+  config: OnboardingConfig,
+  autoDiscoveries: boolean,
+): ContextValue {
   const tourMapRef = useRef<Map<string, OnboardingConfig["tours"][number]>>(
     new Map(),
   );
@@ -102,7 +111,8 @@ export function useBuildContextValue(config: OnboardingConfig): ContextValue {
         tooltipWidth: config.tooltipWidth ?? 320,
         autoLaunchDelay: config.autoLaunchDelay ?? 600,
       },
+      autoDiscoveries,
     }),
-    [config],
+    [config, autoDiscoveries],
   );
 }

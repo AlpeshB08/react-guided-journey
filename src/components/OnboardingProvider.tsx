@@ -9,6 +9,7 @@ import { usePageTour } from "../hooks/usePageTour";
 import { DEFAULT_PERSISTED } from "../persistence/localStorage";
 import type { OnboardingConfig } from "../types";
 import { Checklist } from "./Checklist";
+import { AutoDiscoveries } from "./DiscoveryBanner";
 import { HelpCenter } from "./HelpCenter";
 import { TourRenderer } from "./TourRenderer";
 import { WelcomeModal } from "./WelcomeModal";
@@ -85,6 +86,7 @@ function Runtime({ renderDefaultUI }: { renderDefaultUI: boolean }) {
           <WelcomeModal />
           <Checklist />
           <HelpCenter />
+          <AutoDiscoveries />
         </>
       )}
     </>
@@ -96,7 +98,7 @@ export function OnboardingProvider({
   children,
   renderDefaultUI = true,
 }: ProviderProps) {
-  const value = useBuildContextValue(config);
+  const value = useBuildContextValue(config, renderDefaultUI);
   return (
     <OnboardingContextProvider value={value}>
       {children}
